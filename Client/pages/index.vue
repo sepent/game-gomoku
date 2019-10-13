@@ -1,0 +1,177 @@
+<template>
+  <div class="content-container">
+    <div class="game-board" v-if="isHaveMatch">
+      <div class="content found">
+        <div v-for="y in board.rows" :key="y" class="row">
+          <div
+            v-for="x in board.columns"
+            :key="x"
+            class="column"
+            @click="onClickColumn(x, y)"
+            :class="{
+            'active-x': nodes[x] && nodes[x][y] && nodes[x][y].type == 'x',
+            'active-o': nodes[x] && nodes[x][y] && nodes[x][y].type == 'o'
+            }"
+          />
+        </div>
+      </div>
+    </div>
+    <div class="finding" v-if="!isHaveMatch && !isFinding">
+      <button class="find-match" @click="onClickFind">Tìm trận</button>
+    </div>
+  </div>
+</template>
+
+<script>
+import Logo from "~/components/Logo.vue";
+import audio from '~/config/audio';
+
+export default {
+  components: {
+    Logo
+  },
+
+  data() {
+    return {
+      board: {
+        columns: 50,
+        rows: 50
+      },
+      user: {
+        type: "x"
+      },
+      nodes: {}
+    };
+  },
+
+  methods: {
+    onClickFind() {
+      this.$store.commit("match/finding", true);
+
+      window.setTimeout(() => {
+        this.$store.commit("match/info", {
+          me: {
+            name: "Toi"
+          },
+          player: {
+            name: "Player"
+          }
+        });
+      }, 10000);
+    },
+
+    onClickColumn(x, y, type = 'x', isMachine) {
+      if (this.nodes[x] && this.nodes[x][y]) {
+        return;
+      }
+
+      let nodes = Object.assign({}, this.nodes);
+
+      if (!nodes[x]) {
+        nodes[x] = {};
+      }
+
+      nodes[x][y] = {
+        type: type//this.user.type
+      };
+
+      this.nodes = nodes;
+      audio.chosen.play();
+
+      if (!isMachine) {
+        window.setTimeout(() => {
+            this.onClickColumn(x + 1, y+1, 'o', true);
+          }, 1000);
+        }
+      }
+  },
+
+  watch: {
+    isHaveMatch(value){
+      if (value) {
+        audio.playing.play();
+      }
+    }
+  },
+
+  computed: {
+    isFinding() {
+      return this.$store.state.match.isFinding;
+    },
+
+    isHaveMatch() {
+      return !this.$store.state.match.isFinding && this.$store.state.match.info;
+    }
+  }
+};
+</script>
+
+<style lang="scss">
+.content-container {
+  margin: 10px;
+
+  .game-board {
+    width: 700px;
+    border: 1px solid #dddddd;
+    margin: 0 auto;
+    height: 700px;
+    overflow: auto;
+  }
+
+  .content {
+    .row {
+      display: flex;
+      width: fit-content;
+
+      .column {
+        height: 20px;
+        width: 20px;
+        background: #ffffff;
+        display: inline-block;
+        border: 1px solid #eee;
+        cursor: pointer;
+
+        &.active-x,
+        &.active-o {
+          background-position: center;
+          background-size: contain;
+        }
+
+        &.active-o {
+          background-image: url("/images/o.png");
+        }
+
+        &.active-x {
+          background-image: url("/images/x.png");
+        }
+
+        &:hover {
+          background-color: #eee;
+        }
+      }
+    }
+  }
+
+  .finding {
+    button {
+      border: 1px solid #09c;
+      border-radius: 5px;
+      padding: 5px 10px;
+      background: #ffffff;
+      cursor: pointer;
+      font-size: 30px;
+      margin: auto;
+      display: block;
+
+      &:focus {
+        outline: 0;
+      }
+
+      &:hover {
+        background-color: #09c;
+        color: #ffffff;
+      }
+    }
+  }
+}
+</style>
