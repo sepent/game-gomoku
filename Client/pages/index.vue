@@ -1,6 +1,6 @@
 <template>
   <div class="content-container">
-    <div class="game-board" v-if="isHaveMatch">
+    <div class="game-board" v-if="isPlaying">
       <div class="content found">
         <div v-for="y in board.rows" :key="y" class="row">
           <div
@@ -16,7 +16,7 @@
         </div>
       </div>
     </div>
-    <div class="finding" v-if="!isHaveMatch && !isFinding">
+    <div class="finding" v-if="isNone">
       <button class="find-match" @click="onClickFind">Tìm trận</button>
     </div>
   </div>
@@ -46,9 +46,12 @@ export default {
 
   methods: {
     onClickFind() {
-      this.$store.commit("match/finding", true);
+      // Set status to finding
+      this.$store.commit("match/status", 'finding');
 
+      // Example for founded
       window.setTimeout(() => {
+        // Set info of match
         this.$store.commit("match/info", {
           me: {
             name: "Toi"
@@ -57,9 +60,17 @@ export default {
             name: "Player"
           }
         });
-      }, 10000);
+
+        // Set status waiting
+        this.$store.commit('match/status', 'waiting');
+      }, 1000);
     },
 
+    /**
+     * Event when click cell
+     * @param x
+     * @param y
+     */
     onClickColumn(x, y, type = 'x', isMachine) {
       if (this.nodes[x] && this.nodes[x][y]) {
         return;
@@ -78,6 +89,7 @@ export default {
       this.nodes = nodes;
       audio.chosen.play();
 
+      // Todo
       if (!isMachine) {
         window.setTimeout(() => {
             this.onClickColumn(x + 1, y+1, 'o', true);
@@ -87,7 +99,10 @@ export default {
   },
 
   watch: {
-    isHaveMatch(value){
+    /**
+     * When isPlaying changed
+     */
+    isPlaying(value){
       if (value) {
         audio.playing.play();
       }
@@ -95,12 +110,32 @@ export default {
   },
 
   computed: {
-    isFinding() {
-      return this.$store.state.match.isFinding;
+    /**
+     * Is have no the action
+     */
+    isNone(){
+      return this.$store.state.match.status == 'none';
     },
 
-    isHaveMatch() {
-      return !this.$store.state.match.isFinding && this.$store.state.match.info;
+    /**
+     * Is finding the match
+     */
+    isFinding() {
+      return this.$store.state.match.status == 'finding';
+    },
+
+    /**
+     * Is waiting accept or cancel the match
+     */
+    isWaiting(){
+      return this.$store.state.match.status == 'waiting';
+    },
+
+    /**
+     * Is joined to the match
+     */
+    isPlaying(){
+      return this.$store.state.match.status == 'playing';
     }
   }
 };

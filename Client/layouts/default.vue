@@ -1,40 +1,111 @@
 <template>
   <div class="container">
     <header>
-      <span>GAME CARO</span>
+      <span>GAME CARO <span v-if="isPlaying">{{timer}}</span></span>
     </header>
     <main>
       <nuxt />
     </main>
     <footer>game caro</footer>
-    <find-match :is-finding="isFinding" :match="matchData" @accept="onAcceptMatch" @cancel="onCancelMatch"/>
+    <find-match
+      :show="isShowDialog"
+      :match="matchData"
+      :status="status"
+      @accept="onAcceptMatch"
+      @cancel="onCancelMatch"
+    />
   </div>
 </template>
 
 <script>
 import FindMatch from "~/components/FindMatch.vue";
-import audio from '~/config/audio';
+import audio from "~/config/audio";
 
 export default {
   components: { FindMatch },
+  data(){
+    return {
+      time: 0,
+      interval: null
+    }
+  },
+
   methods: {
-    onAcceptMatch(){
-      this.$store.commit('match/accept', true);
-      this.$store.commit('match/finding', false);
+    /**
+     * Event when click on accept button
+     */
+    onAcceptMatch() {
+      this.$store.commit("match/status", "playing");
       audio.acceptMatch.play();
     },
-    onCancelMatch(){
-      this.$store.commit('match/clear');
+
+    /**
+     * Event when click on cancel button
+     */
+    onCancelMatch() {
+      this.$store.commit("match/clear");
+    }
+  },
+
+  watch: {
+    /**
+     * When status is changed
+     */
+    status(newVal){
+      if (newVal == 'playing') {
+        this.interval = window.setInterval(() => {
+          this.time++;
+        }, 1000);
+      } else {
+        window.clearInterval(this.interval);
+      }
     }
   },
 
   computed: {
-    isFinding() {
-      return this.$store.state.match.isFinding;
+    /**
+     * Is show dialog
+     */
+    isShowDialog() {
+      return (
+        this.$store.state.match.status == "finding" ||
+        this.$store.state.match.status == "waiting"
+      );
     },
 
+    /**
+     * Is playing
+     */
+    isPlaying(){
+      return this.$store.state.match.status == 'playing';
+    },
+
+    /**
+     * Status of match store
+     */
+    status(){
+      return this.$store.state.match.status;
+    },
+
+    /**
+     * Data of match
+     */
     matchData() {
       return this.$store.state.match.info;
+    },
+
+    /**
+     * Timer of playing
+     */
+    timer(){
+      let seconds = 0;
+      let minutes = 0;
+
+      minutes = parseInt(this.time/60);
+      seconds = this.time - (minutes * 60);
+
+      // Convert to format H:i
+      return  (minutes < 10 ? '0' + minutes : minutes) + ':' + (seconds < 10 ? '0' + seconds : seconds);
     }
   }
 };

@@ -1,26 +1,33 @@
 export const state = {
-  accept: false,
   info: null,
-  isFinding: false
+  status: 'none'
 };
 
-
 export const mutations = {
+  /**
+   * Data of match
+   * @param {*} state 
+   * @param {*} data 
+   */
   info(state, data) {
     state.info = data;
   },
 
-  finding(state, data) {
-    state.isFinding = data;
-  },
-
-  accept(state, data){
-    state.accept = data;
-  },
-
+  /**
+   * Clear data
+   * @param {*} state 
+   */
   clear(state) {
     state.info = null;
-    state.isFinding = false;
-    state.accept = false;
+    state.status = 'none';
+  },
+
+  /**
+   * Update status
+   * @param {Object} state 
+   * @param {string} data 
+   */
+  status(state, data){
+    state.status = data;
   }
 };

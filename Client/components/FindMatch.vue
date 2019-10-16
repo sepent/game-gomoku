@@ -1,10 +1,13 @@
 <template>
-  <div class="match-dialog" v-if="isFinding">
-    <div class="dialog-content" v-if="!match">
+  <div class="match-dialog" v-if="show">
+    <div class="dialog-content finding" v-if="status == 'finding'">
       <loading />
+      <div class="timer">
+        {{timer}}
+      </div>
     </div>
 
-    <div class="dialog-content" v-if="match">
+    <div class="dialog-content" v-if="status == 'waiting'">
       <div class="progress" :class="{active: activeProgress}">
         <div class="progress-value"></div>
       </div>
@@ -51,6 +54,14 @@
     background-color: #ffffff;
     border-radius: 8px;
 
+    // CSS for finding content
+    &.finding{
+      text-align: center;
+      .timer{
+        font-size: 1.5rem;
+      }
+    }
+
     button {
       margin: 5px;
       border: 1px solid #bdbdbd;
@@ -83,11 +94,13 @@ import Loading from "~/components/icons/Loading.vue";
 import audio from '~/config/audio';
 
 export default {
-  props: ["isFinding", "match"],
+  props: ["show", "match", "status"],
   data(){
     return {
       timeout: null,
-      activeProgress: false
+      interval: null,
+      activeProgress: false,
+      time: 120
     }
   },
 
@@ -96,10 +109,14 @@ export default {
   },
 
   watch: {
-    match(newData, oldData){
-      if (newData && newData !== oldData) {
+    /**
+     * When match info changed
+     */
+    match(newData){
+      if (newData) {
         this.activeProgress = false;
 
+        // Todo
         window.setTimeout(() => {
           this.activeProgress = true;
         }, 100);
@@ -114,20 +131,48 @@ export default {
       }
     },
 
-    isFinding(newVal){
-      if (newVal && !this.match) {
+    /**
+     * When status is changed
+     */
+    status(newVal){
+      if (newVal == 'finding') {
         audio.finding.play();
+
+        this.interval = window.setInterval(() => {
+          this.time++;
+        }, 1000);
+      } else {
+        window.clearInterval(this.interval);
       }
     }
   },
 
+  computed: {
+    timer(){
+      let seconds = 0;
+      let minutes = 0;
+
+      minutes = parseInt(this.time/60);
+      seconds = this.time - (minutes * 60);
+
+      // Convert to format H:i
+      return  (minutes < 10 ? '0' + minutes : minutes) + ':' + (seconds < 10 ? '0' + seconds : seconds);
+    }
+  },
+
   methods: {
+    /**
+     * When when click on accept button
+     */
     onClickAccept(){
       window.clearTimeout(this.timeout);
       this.$emit('accept');
       audio.stopAudio('foundMatch');
     },
 
+    /**
+     * Event when click on cancel button
+     */
     onClickCancel(){
       window.clearTimeout(this.timeout);
       this.$emit('cancel');
