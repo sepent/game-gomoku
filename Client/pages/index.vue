@@ -8,10 +8,7 @@
             :key="x"
             class="column"
             @click="onClickColumn(x, y)"
-            :class="{
-            'active-x': nodes[x] && nodes[x][y] && nodes[x][y].type == 'x',
-            'active-o': nodes[x] && nodes[x][y] && nodes[x][y].type == 'o'
-            }"
+            :class="chessman(x, y)"
           />
         </div>
       </div>
@@ -24,7 +21,6 @@
 
 <script>
 import Logo from "~/components/Logo.vue";
-import audio from '~/config/audio';
 
 export default {
   components: {
@@ -37,9 +33,6 @@ export default {
         columns: 50,
         rows: 50
       },
-      user: {
-        type: "x"
-      },
       nodes: {}
     };
   },
@@ -47,7 +40,7 @@ export default {
   methods: {
     onClickFind() {
       // Set status to finding
-      this.$store.commit("match/status", 'finding');
+      this.$store.commit("match/status", "finding");
 
       // Example for founded
       window.setTimeout(() => {
@@ -56,13 +49,13 @@ export default {
           me: {
             name: "Toi"
           },
-          player: {
+          rival: {
             name: "Player"
           }
         });
 
         // Set status waiting
-        this.$store.commit('match/status', 'waiting');
+        this.$store.commit("match/status", "waiting");
       }, 1000);
     },
 
@@ -71,7 +64,7 @@ export default {
      * @param x
      * @param y
      */
-    onClickColumn(x, y, type = 'x', isMachine) {
+    onClickColumn(x, y) {
       if (this.nodes[x] && this.nodes[x][y]) {
         return;
       }
@@ -83,26 +76,30 @@ export default {
       }
 
       nodes[x][y] = {
-        type: type//this.user.type
+        player: "me" // rival
       };
 
       this.nodes = nodes;
       audio.chosen.play();
+    },
 
-      // Todo
-      if (!isMachine) {
-        window.setTimeout(() => {
-            this.onClickColumn(x + 1, y+1, 'o', true);
-          }, 1000);
-        }
+    /**
+     * Get chessman
+     */
+    chessman(x, y) {
+      if (this.nodes[x] && this.nodes[x][y]) {
+        return 'active-' + this.$store.state.setting.display.chessman[this.nodes[x][y].player];
       }
+
+      return '';
+    }
   },
 
   watch: {
     /**
      * When isPlaying changed
      */
-    isPlaying(value){
+    isPlaying(value) {
       if (value) {
         audio.playing.play();
       }
@@ -113,29 +110,29 @@ export default {
     /**
      * Is have no the action
      */
-    isNone(){
-      return this.$store.state.match.status == 'none';
+    isNone() {
+      return this.$store.state.match.status == "none";
     },
 
     /**
      * Is finding the match
      */
     isFinding() {
-      return this.$store.state.match.status == 'finding';
+      return this.$store.state.match.status == "finding";
     },
 
     /**
      * Is waiting accept or cancel the match
      */
-    isWaiting(){
-      return this.$store.state.match.status == 'waiting';
+    isWaiting() {
+      return this.$store.state.match.status == "waiting";
     },
 
     /**
      * Is joined to the match
      */
-    isPlaying(){
-      return this.$store.state.match.status == 'playing';
+    isPlaying() {
+      return this.$store.state.match.status == "playing";
     }
   }
 };

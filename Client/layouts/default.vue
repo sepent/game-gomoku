@@ -1,7 +1,15 @@
 <template>
   <div class="container">
     <header>
-      <span>GAME CARO <span v-if="isPlaying">{{timer}}</span></span>
+      <div>
+        <h1>
+          GAME CARO
+        </h1>
+        <div class="right-content">
+        <span v-if="isPlaying" class="timer">{{timer}}</span>
+        <button @click="onOpenSetting" class="btn-setting"></button>
+        </div>
+      </div>
     </header>
     <main>
       <nuxt />
@@ -14,20 +22,22 @@
       @accept="onAcceptMatch"
       @cancel="onCancelMatch"
     />
+    <setting-dialog v-model="isShowSetting" />
   </div>
 </template>
 
 <script>
 import FindMatch from "~/components/FindMatch.vue";
-import audio from "~/config/audio";
+import SettingDialog from "~/components/SettingDialog.vue";
 
 export default {
-  components: { FindMatch },
-  data(){
+  components: { FindMatch, SettingDialog },
+  data() {
     return {
       time: 0,
-      interval: null
-    }
+      interval: null,
+      isShowSetting: false
+    };
   },
 
   methods: {
@@ -44,6 +54,13 @@ export default {
      */
     onCancelMatch() {
       this.$store.commit("match/clear");
+    },
+
+    /**
+     * Setting for game
+     */
+    onOpenSetting() {
+      this.isShowSetting = true;
     }
   },
 
@@ -51,8 +68,8 @@ export default {
     /**
      * When status is changed
      */
-    status(newVal){
-      if (newVal == 'playing') {
+    status(newVal) {
+      if (newVal == "playing") {
         this.interval = window.setInterval(() => {
           this.time++;
         }, 1000);
@@ -76,14 +93,14 @@ export default {
     /**
      * Is playing
      */
-    isPlaying(){
-      return this.$store.state.match.status == 'playing';
+    isPlaying() {
+      return this.$store.state.match.status == "playing";
     },
 
     /**
      * Status of match store
      */
-    status(){
+    status() {
       return this.$store.state.match.status;
     },
 
@@ -97,15 +114,19 @@ export default {
     /**
      * Timer of playing
      */
-    timer(){
+    timer() {
       let seconds = 0;
       let minutes = 0;
 
-      minutes = parseInt(this.time/60);
-      seconds = this.time - (minutes * 60);
+      minutes = parseInt(this.time / 60);
+      seconds = this.time - minutes * 60;
 
       // Convert to format H:i
-      return  (minutes < 10 ? '0' + minutes : minutes) + ':' + (seconds < 10 ? '0' + seconds : seconds);
+      return (
+        (minutes < 10 ? "0" + minutes : minutes) +
+        ":" +
+        (seconds < 10 ? "0" + seconds : seconds)
+      );
     }
   }
 };
@@ -143,6 +164,51 @@ body,
     align-items: center;
     padding: 5px 10px;
     justify-content: center;
+
+    > div{
+      width: 700px;
+      margin: 0 auto;
+      display: flex;
+
+      h1 {
+        margin: 0;
+        display: inline
+      }
+
+      div.right-content{
+        display: flex;
+        align-items: center;
+        flex: 1;
+        justify-content: flex-end;
+
+        .timer{
+          margin-right: 20px;
+        }
+
+        .btn-setting {
+          background-image: url(/images/settings.png);
+          height: 30px;
+          width: 30px;
+          background-position: center;
+          background-size: contain;
+          background-color: transparent;
+          border: 0;
+          cursor: pointer;
+
+          &:focus {
+            outline: 0;
+          }
+        }
+      }
+
+      &:after{
+        display: block;
+        content: '';
+        clear: both;
+      }
+    }
+
+    
   }
 
   // CSS for main

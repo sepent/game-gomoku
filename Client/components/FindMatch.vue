@@ -12,7 +12,7 @@
         <div class="progress-value"></div>
       </div>
 
-      Đối thủ: {{match.player.name}}
+      Đối thủ: {{match.rival.name}}
       <button class="accept" @click="onClickAccept">Chấp nhận</button>
       <button  @click="onClickCancel">Hủy</button>
     </div>
@@ -91,7 +91,6 @@
 
 <script>
 import Loading from "~/components/icons/Loading.vue";
-import audio from '~/config/audio';
 
 export default {
   props: ["show", "match", "status"],
