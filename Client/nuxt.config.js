@@ -22,12 +22,12 @@ export default {
   /*
   ** Global CSS
   */
-  css: [
-  ],
+  css: [],
   /*
   ** Plugins to load before mounting the App
   */
   plugins: [
+    'assets/scss/addition.scss',
     'plugins/audio'
   ],
   /*
