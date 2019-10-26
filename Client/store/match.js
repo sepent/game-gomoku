@@ -14,6 +14,13 @@ export const mutations = {
   },
 
   /**
+   * Update innings info
+   */
+  innings(state, data){
+    state.info.innings = data;
+  },
+
+  /**
    * Clear data
    * @param {*} state 
    */

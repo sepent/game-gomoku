@@ -49,8 +49,8 @@
         <div class="setting-content">
           <div>
             <label>Cờ của bạn:</label>
-            <input type="radio" v-model="display.chessman.me" value="x" @change="onChangeChessman" /><img src="/images/x.png"/>
-            <input type="radio" v-model="display.chessman.me" value="o" @change="onChangeChessman" /><img src="/images/o.png"/>
+            <input type="radio" v-model="display.chessman.me" value="x" @change="onChangeChessman" /><div class="chessman chessman-x"/>
+            <input type="radio" v-model="display.chessman.me" value="o" @change="onChangeChessman" /><div class="chessman chessman-o"/>
           </div>
         </div>
       </div>
@@ -106,10 +106,6 @@
       > div {
         display: flex;
         align-items: center;
-      }
-
-      img {
-        height: 20px;
       }
 
       label {

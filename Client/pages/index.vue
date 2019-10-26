@@ -1,5 +1,8 @@
 <template>
   <div class="content-container">
+    <div class="game-player-info" v-if="isPlaying">
+      <player-info :match="match" player="me"/>
+    </div>
     <div class="game-board" v-if="isPlaying">
       <div class="content found">
         <div v-for="y in board.rows" :key="y" class="row">
@@ -13,6 +16,9 @@
         </div>
       </div>
     </div>
+    <div class="game-player-info" v-if="isPlaying">
+      <player-info :match="match" player="rival"/>
+    </div>
     <div class="finding" v-if="isNone">
       <button class="find-match" @click="onClickFind">Tìm trận</button>
     </div>
@@ -21,10 +27,12 @@
 
 <script>
 import Logo from "~/components/Logo.vue";
+import PlayerInfo from '~/components/PlayerInfo.vue';
 
 export default {
   components: {
-    Logo
+    Logo,
+    PlayerInfo
   },
 
   data() {
@@ -47,11 +55,14 @@ export default {
         // Set info of match
         this.$store.commit("match/info", {
           me: {
+            id: 1,
             name: "Toi"
           },
           rival: {
+            id: 2,
             name: "Player"
-          }
+          },
+          innings: 1
         });
 
         // Set status waiting
@@ -81,6 +92,16 @@ export default {
 
       this.nodes = nodes;
       audio.chosen.play();
+
+      this.onChangeInnings(this.match.info.rival.id);
+    },
+
+    /**
+     * On change innings
+     * @param {number} id
+     */
+    onChangeInnings(id){
+      this.$store.commit('match/innings', id);
     },
 
     /**
@@ -108,31 +129,39 @@ export default {
 
   computed: {
     /**
+     * Get match info
+     * @return {Object}
+     */
+    match(){
+      return this.$store.state.match;
+    },
+
+    /**
      * Is have no the action
      */
     isNone() {
-      return this.$store.state.match.status == "none";
+      return this.match.status == "none";
     },
 
     /**
      * Is finding the match
      */
     isFinding() {
-      return this.$store.state.match.status == "finding";
+      return this.match.status == "finding";
     },
 
     /**
      * Is waiting accept or cancel the match
      */
     isWaiting() {
-      return this.$store.state.match.status == "waiting";
+      return this.match.status == "waiting";
     },
 
     /**
      * Is joined to the match
      */
     isPlaying() {
-      return this.$store.state.match.status == "playing";
+      return this.match.status == "playing";
     }
   }
 };
@@ -141,13 +170,23 @@ export default {
 <style lang="scss">
 .content-container {
   margin: 10px;
+  display: flex;
+  width: 1130px;
+  margin: 0 auto;
+
+  // CSS for player info
+  .game-player-info{
+    flex: 0 0 200px;
+    margin-top: 15px;
+  }
 
   .game-board {
-    width: 700px;
     border: 1px solid #dddddd;
-    margin: 0 auto;
     height: 700px;
     overflow: auto;
+    flex: 1 0 0;
+    margin: 0 15px;
+    margin-top: 15px;
   }
 
   .content {
@@ -185,6 +224,10 @@ export default {
   }
 
   .finding {
+    text-align: center;
+    width: 100%;
+    margin-top: 15px;
+
     button {
       border: 1px solid #09c;
       border-radius: 5px;

@@ -1,0 +1,18 @@
+.chessman{
+  height: 20px;
+  width: 20px;
+
+  &-x, &-o{
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+  }
+
+  &-x{
+    background-image: url('/images/x.png');
+  }
+
+  &-o{
+    background-image: url('/images/o.png');
+  }
+}
