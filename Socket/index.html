@@ -1,0 +1,50 @@
+<script src="/socket.io/socket.io.js"></script>
+<script>
+  var socket = io('http://localhost');
+
+  socket.on('connection', function(data){
+    // Trigger start to server
+    socket.emit('start', {
+      username: 'tranlamtoi',
+      displayName: 'Tran Lam Toi'
+    });
+
+    // Event when socket disconnected
+    socket.on('disconnect', function(){
+      alert('You are disconnected!');
+    });
+
+    // Trigger finding event
+    socket.emit('finding');
+
+    // Event when found the match
+    socket.on('found', function(data){
+      console.log(data);
+      // Waiting
+      socket.timer = setTimeout(function(){
+        socket.emit('cancel');
+      }, 5000);
+
+      setTimeout(function(){
+        socket.emit('accept');
+      }, 3000);
+    });
+
+    // Event when playing
+    socket.on('playing', function(){
+      setTimeout(function(){
+        socket.emit('chosen', {
+          x: 1,
+          y: 1
+        });
+      }, 3000);
+    });
+  });
+
+  // When server trigger event news
+  // socket.on('news', function (data) {
+  //   //console.log(data);
+  //   document.body.innerHTML = data.hello;
+  //   socket.emit('my other event', { my: 'data' });
+  // });
+</script>
