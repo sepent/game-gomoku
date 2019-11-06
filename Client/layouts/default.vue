@@ -45,7 +45,8 @@ export default {
      * Event when click on accept button
      */
     onAcceptMatch() {
-      this.$store.commit("match/status", "playing");
+      this.$socket.accept();
+      // this.$store.commit("match/status", "playing");
       audio.acceptMatch.play();
     },
 
@@ -53,7 +54,7 @@ export default {
      * Event when click on cancel button
      */
     onCancelMatch() {
-      this.$store.commit("match/clear");
+      this.$socket.cancel();
     },
 
     /**

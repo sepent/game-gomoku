@@ -48,26 +48,27 @@ export default {
   methods: {
     onClickFind() {
       // Set status to finding
-      this.$store.commit("match/status", "finding");
+      // this.$store.commit("match/status", "finding");
 
       // Example for founded
-      window.setTimeout(() => {
-        // Set info of match
-        this.$store.commit("match/info", {
-          me: {
-            id: 1,
-            name: "Toi"
-          },
-          rival: {
-            id: 2,
-            name: "Player"
-          },
-          innings: 1
-        });
+      // window.setTimeout(() => {
+      //   // Set info of match
+        // this.$store.commit("match/info", {
+        //   me: {
+        //     id: 1,
+        //     name: "Toi"
+        //   },
+        //   rival: {
+        //     id: 2,
+        //     name: "Player"
+        //   },
+        //   innings: 1
+        // });
 
-        // Set status waiting
-        this.$store.commit("match/status", "waiting");
-      }, 1000);
+      //   // Set status waiting
+      //   this.$store.commit("match/status", "waiting");
+      // }, 1000);
+      this.$socket.finding();
     },
 
     /**
@@ -93,7 +94,8 @@ export default {
       this.nodes = nodes;
       audio.chosen.play();
 
-      this.onChangeInnings(this.match.info.rival.id);
+      // this.onChangeInnings(this.match.info.rival.id);
+      this.$socket.chosen({x, y});
     },
 
     /**
@@ -101,7 +103,7 @@ export default {
      * @param {number} id
      */
     onChangeInnings(id){
-      this.$store.commit('match/innings', id);
+      // this.$store.commit('match/innings', id);
     },
 
     /**
