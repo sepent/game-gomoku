@@ -119,14 +119,6 @@ export default {
         window.setTimeout(() => {
           this.activeProgress = true;
         }, 100);
-
-        this.timeout = window.setTimeout(() => {
-          this.$emit('cancel');
-        }, 5000);
-
-        // Create new sound
-        audio.stopAudio('finding');
-        audio.foundMatch.play();
       }
     },
 
@@ -135,8 +127,6 @@ export default {
      */
     status(newVal){
       if (newVal == 'finding') {
-        audio.finding.play();
-
         this.interval = window.setInterval(() => {
           this.time++;
         }, 1000);
@@ -166,7 +156,6 @@ export default {
     onClickAccept(){
       window.clearTimeout(this.timeout);
       this.$emit('accept');
-      audio.stopAudio('foundMatch');
     },
 
     /**
@@ -175,7 +164,6 @@ export default {
     onClickCancel(){
       window.clearTimeout(this.timeout);
       this.$emit('cancel');
-      audio.stopAudio('foundMatch');
     }
   }
 };

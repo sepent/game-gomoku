@@ -40,35 +40,13 @@ export default {
       board: {
         columns: 50,
         rows: 50
-      },
-      nodes: {}
+      }
     };
   },
 
   methods: {
     onClickFind() {
-      // Set status to finding
-      // this.$store.commit("match/status", "finding");
-
-      // Example for founded
-      // window.setTimeout(() => {
-      //   // Set info of match
-        // this.$store.commit("match/info", {
-        //   me: {
-        //     id: 1,
-        //     name: "Toi"
-        //   },
-        //   rival: {
-        //     id: 2,
-        //     name: "Player"
-        //   },
-        //   innings: 1
-        // });
-
-      //   // Set status waiting
-      //   this.$store.commit("match/status", "waiting");
-      // }, 1000);
-      this.$socket.finding();
+      this.$game.finding();
     },
 
     /**
@@ -81,29 +59,7 @@ export default {
         return;
       }
 
-      let nodes = Object.assign({}, this.nodes);
-
-      if (!nodes[x]) {
-        nodes[x] = {};
-      }
-
-      nodes[x][y] = {
-        player: "me" // rival
-      };
-
-      this.nodes = nodes;
-      audio.chosen.play();
-
-      // this.onChangeInnings(this.match.info.rival.id);
-      this.$socket.chosen({x, y});
-    },
-
-    /**
-     * On change innings
-     * @param {number} id
-     */
-    onChangeInnings(id){
-      // this.$store.commit('match/innings', id);
+      this.$game.chosen({x, y});
     },
 
     /**
@@ -124,7 +80,7 @@ export default {
      */
     isPlaying(value) {
       if (value) {
-        audio.playing.play();
+        // audio.playing.play();
       }
     }
   },
@@ -136,6 +92,10 @@ export default {
      */
     match(){
       return this.$store.state.match;
+    },
+
+    nodes(){
+      return this.$store.state.match.gameboard
     },
 
     /**

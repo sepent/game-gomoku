@@ -1,6 +1,7 @@
 export const state = {
   info: null,
-  status: 'none'
+  status: 'none',
+  gameboard: [] // [x][y]
 };
 
 export const mutations = {
@@ -36,5 +37,14 @@ export const mutations = {
    */
   status(state, data){
     state.status = data;
+  },
+
+  /**
+   * Update gameboard
+   * @param {*} state 
+   * @param {*} data 
+   */
+  gameboard(state, data){
+    state.gameboard = data;
   }
 };

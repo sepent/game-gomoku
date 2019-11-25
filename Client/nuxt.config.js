@@ -29,7 +29,7 @@ export default {
   plugins: [
     'assets/scss/addition.scss',
     'plugins/audio',
-    'plugins/socket'
+    'plugins/game'
   ],
   /*
   ** Nuxt.js dev-modules

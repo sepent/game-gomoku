@@ -4,10 +4,33 @@ window.audio = {
   finding: new Audio('/audio/finding.mp3'),
   chosen: new Audio('/audio/chosen.wav'),
   playing: new Audio('/audio/playing.mp3'),
+  currentRunning: null,
 
-  stopAudio(name){
-    this[name].pause();
+  /**
+   * Stop audio
+   * @param {*} name 
+   */
+  stop(){
+    if (this.currentRunning) {
+      this[this.currentRunning].pause();
+      this.currentRunning = null;
+    }
+  },
+
+  /**
+   * Play audio
+   * @param {*} name 
+   */
+  play(name, clearCurrent){
+    clearCurrent = clearCurrent !== false ? true : false;
+
+    if (clearCurrent) {
+      this.stop();
+    }
+    
+    this.currentRunning = name;
     this[name].currentTime = 0;
+    this[name].play();
   },
 
   /**

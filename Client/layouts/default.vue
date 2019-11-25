@@ -45,16 +45,16 @@ export default {
      * Event when click on accept button
      */
     onAcceptMatch() {
-      this.$socket.accept();
+      this.$game.accept();
       // this.$store.commit("match/status", "playing");
-      audio.acceptMatch.play();
+      // audio.acceptMatch.play();
     },
 
     /**
      * Event when click on cancel button
      */
     onCancelMatch() {
-      this.$socket.cancel();
+      this.$game.cancel();
     },
 
     /**
