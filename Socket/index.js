@@ -25,7 +25,11 @@ io.on('connection', function (socket) {
   // Event when disconnect
   socket.on('disconnect', function(){
     if (socket.user) {
-      console.log(socket.user.displayName + ' disconnected');
+      socket.leave('random_room');
+      // io.to('random_room').emit('endgame', {
+      //   type: 'win'
+      // });
+      io.to('random_room').emit('rival-disconnect');
     }
   });
 
@@ -33,50 +37,38 @@ io.on('connection', function (socket) {
   // Trigger event found the match
   socket.emit('found', {match: '123'});
 
-  // CLIENT EVENT
-  // Event when register info
-  socket.on('client::start', function(data){
-    socket.user = data;
-    console.log(data);
-  });
-
   // Event when finding the match
-  socket.on('client::finding', function(){
-    console.log(socket.user.displayName + ' finding ...');
+  socket.on('client::finding', function(data){
+    socket.user = data;
+    socket.join('random_room');
 
-    setTimeout(function(){
-      socket.emit('server::found', {
+    if (io.sockets.adapter.rooms['random_room'].length == 2) {
+      io.to('random_room').emit('server::found', {
         me: {
-          id: 1,
+          id: socket.user.id,
           name: "Toi"
         },
         rival: {
-          id: 2,
+          id: socket.user.id === 1 ? 2 : 1,
           name: "Player"
         },
         innings: 1
       });
-
-      // If another user cancel
-      setTimeout(function(){
-        socket.emit('server::cancel');
-      }, 2000);
-    }, 3000);
+    }
   });
 
   // Event when accept
   socket.on('client::accept', function(){
-    console.log('user accepted');
-    socket.emit('server::playing');
+    io.to('random_room').emit('server::playing');
   });
 
   // Event when accept
   socket.on('client::cancel', function(){
-    console.log('user canceled');
+    io.to('random_room').emit('server::cancel');
   });
 
   // Event when choosen
-  socket.on('client::chosen', function(data){
-    console.log(data);
+  socket.on('client::chosen', function(chessman){
+    io.to('random_room').emit('server::chosen', {player: socket.user.id, innings: socket.user.id === 1 ? 2 : 1, chessman});
   });
 });
